@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Largs Colts 2026 World Cup Sweepstake</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:#f1f5f9;color:#1e293b}
+.hdr{background:#111827;border-bottom:3px solid #16a34a;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.logo{width:54px;height:54px;border-radius:50%;background:white;padding:3px;flex-shrink:0;object-fit:contain}
+.hc{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16a34a}
+.ht{font-size:18px;font-weight:800;color:white;line-height:1.15}
+.hs{font-size:11px;color:#94a3b8}
+.stats{display:flex;background:#1e293b}
+.st{flex:1;padding:10px 4px;text-align:center;border-right:1px solid rgba(255,255,255,.08)}
+.st:last-child{border-right:none}
+.sl{font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;display:block}
+.sv{font-size:17px;font-weight:800;display:block}
+.wrap{padding:10px;max-width:600px;margin:0 auto}
+.card{background:white;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #e2e8f0}
+.ct{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:8px}
+.syncbar{display:flex;align-items:center;justify-content:space-between;background:white;border-radius:10px;padding:10px 14px;margin-bottom:10px;border:1px solid #e2e8f0}
+.syncmsg{font-size:12px;color:#64748b}
+.syncbtn{background:#111827;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
+.adminbtn{background:#16a34a;color:white;border:none;border-radius:7px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;margin-left:6px}
+input,select{display:block;width:100%;padding:12px 14px;border:2px solid #e2e8f0;border-radius:8px;font-size:16px;color:#1e293b;background:white;margin-bottom:8px;outline:none;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:#16a34a}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;text-align:center;margin-bottom:8px;-webkit-appearance:none;appearance:none}
+.green{background:#16a34a;color:white}
+.dark{background:#111827;color:white}
+.gray{background:#e2e8f0;color:#334155}
+.red{background:#dc2626;color:white}
+.gold{background:#ca8a04;color:white}
+.row{display:flex;gap:8px}
+.row .btn{margin-bottom:0}
+
+/* Number grid */
+.ng{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.nb{width:calc(12.5% - 5px);height:42px;border:2px solid #cbd5e1;border-radius:7px;background:#f8fafc;color:#475569;font-size:14px;font-weight:700;padding:0;line-height:38px;text-align:center;cursor:default}
+.nb.s{background:#16a34a!important;border-color:#15803d!important;color:white!important}
+.nb.mine{background:#ca8a04!important;border-color:#92400e!important;color:white!important}
+
+/* Prize cards */
+.prizes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.prize{text-align:center;padding:10px 4px;border-radius:10px;border:1px solid #e2e8f0}
+.prize-icon{font-size:22px;display:block;margin-bottom:2px}
+.prize-lbl{font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;display:block}
+.prize-amt{font-size:18px;font-weight:800;display:block}
+.prize.p1{background:#fff7ed;border-color:#fed7aa}
+.prize.p2{background:#f8fafc;border-color:#e2e8f0}
+.prize.p3{background:#f0fdf4;border-color:#bbf7d0}
+
+/* Draw results */
+.draw-result{display:none}
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.podium-card{text-align:center;padding:12px 8px;border-radius:10px;border:2px solid}
+.podium-card.p1{background:#fff7ed;border-color:#f59e0b}
+.podium-card.p2{background:#f8fafc;border-color:#94a3b8}
+.podium-card.p3{background:#f0fdf4;border-color:#16a34a}
+.pod-pos{font-size:20px;display:block}
+.pod-team{font-size:13px;font-weight:800;display:block;margin:4px 0 2px}
+.pod-num{font-size:11px;color:#64748b;display:block}
+.pod-name{font-size:12px;font-weight:700;display:block;margin-top:2px}
+.pod-prize{font-size:14px;font-weight:800;display:block;margin-top:4px}
+.pod-prize.p1{color:#ca8a04}
+.pod-prize.p2{color:#475569}
+.pod-prize.p3{color:#16a34a}
+
+/* Full draw table */
+.draw-table{width:100%;border-collapse:collapse;font-size:13px}
+.draw-table th{background:#1e293b;color:white;padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.draw-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9}
+.draw-table tr:last-child td{border-bottom:none}
+.draw-table tr:nth-child(even) td{background:#f8fafc}
+
+/* Spinner overlay */
+.spinner-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;flex-direction:column}
+.spinner-overlay.active{display:flex}
+.spinner-box{background:#111827;border-radius:16px;padding:28px 24px;text-align:center;max-width:320px;width:90%;border:2px solid #16a34a}
+.spinner-title{font-size:14px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px}
+.spinner-drum{height:64px;overflow:hidden;position:relative;margin-bottom:16px}
+.spinner-item{height:64px;line-height:64px;font-size:22px;font-weight:800;color:white;transition:none}
+.spinner-status{font-size:13px;color:#64748b;margin-bottom:8px}
+.spinner-progress{width:100%;height:6px;background:#374151;border-radius:3px;overflow:hidden;margin-bottom:16px}
+.spinner-bar{height:100%;background:#16a34a;width:0%;transition:width 0.3s}
+
+/* Player list */
+.pi{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f1f5f9}
+.pi:last-child{border-bottom:none}
+.pn{width:34px;height:34px;border-radius:7px;background:#16a34a;color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pt{font-size:11px;color:#64748b;display:block}
+.pm{flex:1;font-size:15px}
+.db{background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;padding:2px 8px;line-height:1}
+.em{font-size:13px;color:#94a3b8;text-align:center;padding:12px 0}
+.msg{font-size:13px;margin-top:4px;padding:8px 12px;border-radius:7px;display:none}
+.msg.err{background:#fee2e2;color:#b91c1c}
+.msg.ok{background:#dcfce7;color:#15803d}
+.admin-panel{display:none;background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:14px;margin-bottom:10px}
+.admin-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#15803d;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-admin{background:#111827;color:white}
+.locked-banner{background:#ca8a04;color:white;text-align:center;padding:10px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:10px;display:none}
+footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- Spinner overlay -->
+<div class="spinner-overlay" id="spinnerOverlay">
+  <div class="spinner-box">
+    <div class="spinner-title">&#127381; Running the draw...</div>
+    <div class="spinner-drum" id="spinnerDrum">
+      <div class="spinner-item" id="spinnerItem">?</div>
+    </div>
+    <div class="spinner-status" id="spinnerStatus">Shuffling teams...</div>
+    <div class="spinner-progress"><div class="spinner-bar" id="spinnerBar"></div></div>
+    <div style="color:#94a3b8;font-size:12px">Assigning all 48 teams to numbers</div>
+  </div>
+</div>
+
+<div class="hdr">
+  <img class="logo" src="data:image/jpeg;base64,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" alt="Largs Colts FC">
+  <div>
+    <div class="hc">Largs Colts 2017s &middot; Fundraiser</div>
+    <div class="ht">2026 World Cup Sweepstake</div>
+    <div class="hs">&#163;10 per number &middot; 48 teams &middot; Win up to &#163;150</div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="st"><span class="sl">Sold</span><span class="sv" id="ss" style="color:white">0/48</span></div>
+  <div class="st"><span class="sl">Prize pot</span><span class="sv" id="sp" style="color:#fbbf24">&#163;240</span></div>
+  <div class="st"><span class="sl">To team</span><span class="sv" id="st2" style="color:#4ade80">&#163;240</span></div>
+  <div class="st"><span class="sl">Draw</span><span class="sv" id="drawStatus" style="color:#94a3b8;font-size:12px">Pending</span></div>
+</div>
+
+<div class="wrap">
+
+<div class="locked-banner" id="lockedBanner">&#127381; Draw complete &mdash; teams have been assigned!</div>
+
+<div class="syncbar">
+  <span class="syncmsg" id="syncmsg">Loading...</span>
+  <span>
+    <button class="syncbtn" onclick="loadData(true)">&#8635; Refresh</button>
+    <button class="adminbtn" id="adminToggleBtn" onclick="toggleAdminLogin()">Admin</button>
+  </span>
+</div>
+
+<!-- Admin login -->
+<div class="card" id="adminLoginCard" style="display:none;border-color:#86efac;background:#f0fdf4">
+  <div class="ct" style="color:#15803d">Admin login</div>
+  <input type="password" id="adminPwd" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminLogin()">
+  <div class="row">
+    <button class="btn dark" onclick="adminLogin()">Login</button>
+    <button class="btn gray" onclick="toggleAdminLogin()">Cancel</button>
+  </div>
+  <div class="msg err" id="loginErr">Wrong password</div>
+</div>
+
+<!-- Admin panel -->
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-label">&#9881; Admin controls <span class="badge badge-admin">Admin mode</span></div>
+  <button class="btn gold" id="runDrawBtn" onclick="confirmDraw()">&#127381; Run the draw — assign teams to numbers</button>
+  <div class="msg err" id="drawErr"></div>
+  <div id="resetDrawWrap" style="display:none">
+    <button class="btn gray" onclick="resetDraw()">Reset draw (use with caution)</button>
+  </div>
+  <div style="margin-top:10px;padding-top:10px;border-top:1px solid #86efac">
+    <button class="btn gray" style="margin:0" onclick="adminLogout()">Log out</button>
+  </div>
+</div>
+
+<!-- Prize breakdown -->
+<div class="card">
+  <div class="ct">Prize breakdown</div>
+  <div class="prizes">
+    <div class="prize p1"><span class="prize-icon">&#129351;</span><span class="prize-lbl">1st place</span><span class="prize-amt" style="color:#ca8a04">&#163;150</span></div>
+    <div class="prize p2"><span class="prize-icon">&#129352;</span><span class="prize-lbl">2nd place</span><span class="prize-amt" style="color:#475569">&#163;65</span></div>
+    <div class="prize p3"><span class="prize-icon">&#129353;</span><span class="prize-lbl">3rd place</span><span class="prize-amt" style="color:#16a34a">&#163;25</span></div>
+  </div>
+  <p style="font-size:12px;color:#94a3b8;margin-top:8px;text-align:center">48 &times; &#163;10 = &#163;480 &middot; &#163;240 prizes &middot; &#163;240 to the team</p>
+</div>
+
+<!-- Number grid -->
+<div class="card">
+  <div class="ct">Numbers</div>
+  <div style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:#64748b"><span style="width:12px;height:12px;background:#f8fafc;border:2px solid #cbd5e1;border-radius:3px;display:inline-block"></span>Available</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:12px;color:#64748b"><span style="width:12px;height:12px;background:#16a34a;border-radius:3px;display:inline-block"></span>Taken</span>
+  </div>
+  <div class="ng" id="ng"></div>
+  <p style="font-size:12px;color:#94a3b8">Numbers turn green when someone registers. Once all 48 are sold the draw takes place.</p>
+</div>
+
+<!-- Register -->
+<div class="card" id="registerCard">
+  <div class="ct">Register your number</div>
+  <p style="font-size:13px;color:#64748b;margin-bottom:10px">Pick any available number for &#163;10. After the draw, your number will be randomly assigned a World Cup team.</p>
+  <input type="text" id="pn" placeholder="Your name" autocomplete="off" autocorrect="off" spellcheck="false">
+  <select id="pnum" style="margin-bottom:8px"></select>
+  <button class="btn green" onclick="registerPlayer()">+ Register my number &mdash; &#163;10</button>
+  <div class="msg err" id="regErr"></div>
+  <div class="msg ok" id="regOk"></div>
+</div>
+
+<!-- Draw results -->
+<div class="draw-result card" id="drawResultCard">
+  <div class="ct">&#127381; Draw results &mdash; your teams</div>
+  <div class="podium" id="podium"></div>
+  <div class="ct" style="margin-top:4px">Full draw</div>
+  <div style="overflow-x:auto">
+    <table class="draw-table" id="drawTable">
+      <thead><tr><th>#</th><th>Name</th><th>Team</th></tr></thead>
+      <tbody id="drawBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Players registered -->
+<div class="card">
+  <div class="ct">Players registered</div>
+  <div id="pl"><div class="em">No players registered yet</div></div>
+</div>
+
+<!-- How it works -->
+<div class="card">
+  <div class="ct">How it works</div>
+  <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155;line-height:1.45"><span>&#9312;</span><span>Pick any number from 1-48 and pay &#163;10 to the secretary</span></div>
+  <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155;line-height:1.45"><span>&#9313;</span><span>Once all 48 numbers are sold, the admin runs a live randomised draw</span></div>
+  <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155;line-height:1.45"><span>&#9314;</span><span>Each number is randomly assigned one of the 48 World Cup teams</span></div>
+  <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#334155;line-height:1.45"><span>&#9315;</span><span>Whoever holds the number assigned to 1st, 2nd &amp; 3rd place wins the prize</span></div>
+  <div style="display:flex;gap:8px;padding:6px 0;font-size:13px;color:#334155;line-height:1.45"><span>&#127942;</span><span>&#163;150 for 1st &middot; &#163;65 for 2nd &middot; &#163;25 for 3rd &middot; &#163;240 to the team</span></div>
+</div>
+
+</div>
+<footer>Largs Colts F.C. &middot; 2017s &middot; World Cup Sweepstake 2026 &middot; S.Y.F.A.</footer>
+
+<script>
+var PL={}, DRAW=null, DRAW_LOCKED=false, TEAMS=[];
+var isAdmin=false, adminPwd='';
+var autoTimer=null;
+
+// Build number grid 1-48
+var ng=document.getElementById('ng');
+for(var i=1;i<=48;i++){
+  (function(n){
+    var b=document.createElement('button');
+    b.className='nb'; b.id='nb'+n; b.textContent=n;
+    ng.appendChild(b);
+  })(i);
+}
+
+function rSel(){
+  var s=document.getElementById('pnum'), p=s.value;
+  s.innerHTML='';
+  for(var i=1;i<=48;i++){
+    if(!PL[i]){
+      var o=document.createElement('option');
+      o.value=i; o.textContent='Number '+i;
+      s.appendChild(o);
+    }
+  }
+  if(p) s.value=p;
+}
+
+function setSyncMsg(m){ document.getElementById('syncmsg').textContent=m; }
+function showMsg(id,msg,type){ var el=document.getElementById(id); el.className='msg '+(type||'err'); el.textContent=msg; el.style.display='block'; }
+function hideMsg(id){ document.getElementById(id).style.display='none'; }
+
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
+function toggleAdminLogin(){
+  var c=document.getElementById('adminLoginCard');
+  c.style.display=c.style.display==='none'?'block':'none';
+  hideMsg('loginErr');
+  document.getElementById('adminPwd').value='';
+}
+
+function adminLogin(){
+  var pwd=document.getElementById('adminPwd').value;
+  fetch('/api/admin',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:pwd,data:{players:PL,draw:DRAW,drawLocked:DRAW_LOCKED}})})
+  .then(function(r){
+    if(r.ok){
+      isAdmin=true; adminPwd=pwd;
+      document.getElementById('adminLoginCard').style.display='none';
+      document.getElementById('adminPanel').style.display='block';
+      document.getElementById('adminToggleBtn').textContent='Admin ON';
+      document.getElementById('resetDrawWrap').style.display=DRAW_LOCKED?'block':'none';
+    } else showMsg('loginErr','Wrong password');
+  }).catch(function(){ showMsg('loginErr','Connection error'); });
+}
+
+function adminLogout(){
+  isAdmin=false; adminPwd='';
+  document.getElementById('adminPanel').style.display='none';
+  document.getElementById('adminToggleBtn').textContent='Admin';
+}
+
+function confirmDraw(){
+  var sold=Object.keys(PL).length;
+  if(sold<48){
+    showMsg('drawErr','Cannot run draw yet \u2014 only '+sold+'/48 numbers sold');
+    return;
+  }
+  if(!confirm('Run the draw now? This will randomly assign all 48 World Cup teams to numbers and CANNOT be undone (unless you reset as admin).')) return;
+  runDraw();
+}
+
+function runDraw(){
+  hideMsg('drawErr');
+  // Show spinner
+  var overlay=document.getElementById('spinnerOverlay');
+  overlay.classList.add('active');
+  var drum=document.getElementById('spinnerItem');
+  var status=document.getElementById('spinnerStatus');
+  var bar=document.getElementById('spinnerBar');
+  var step=0, total=60;
+  var teamList=TEAMS.slice();
+  var spinInterval=setInterval(function(){
+    drum.textContent=teamList[Math.floor(Math.random()*teamList.length)];
+    step++;
+    bar.style.width=Math.min(100,Math.round(step/total*100))+'%';
+    if(step===20) status.textContent='Assigning teams to numbers...';
+    if(step===40) status.textContent='Almost done...';
+    if(step>=total){
+      clearInterval(spinInterval);
+      status.textContent='Done!';
+      // Actually run the draw on server
+      fetch('/api/admin/draw',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({password:adminPwd})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        setTimeout(function(){
+          overlay.classList.remove('active');
+          if(d.error){
+            showMsg('drawErr',d.error);
+          } else {
+            DRAW=d.draw; DRAW_LOCKED=true;
+            document.getElementById('resetDrawWrap').style.display='block';
+            renderDraw();
+            setSyncMsg('Draw complete \u2713');
+          }
+        },600);
+      })
+      .catch(function(){
+        overlay.classList.remove('active');
+        showMsg('drawErr','Draw failed \u2014 try again');
+      });
+    }
+  },50);
+}
+
+function resetDraw(){
+  if(!confirm('Reset the draw? This removes all team assignments. Players keep their numbers.')) return;
+  fetch('/api/admin/resetdraw',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:adminPwd})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.ok){ DRAW=null; DRAW_LOCKED=false; document.getElementById('resetDrawWrap').style.display='none'; go(); setSyncMsg('Draw reset'); }
+  });
+}
+
+// ── PUBLIC REGISTER ───────────────────────────────────────────────────────────
+function registerPlayer(){
+  var name=document.getElementById('pn').value.trim();
+  var num=parseInt(document.getElementById('pnum').value,10);
+  hideMsg('regErr'); hideMsg('regOk');
+  if(!name){ showMsg('regErr','Please enter your name'); return; }
+  if(DRAW_LOCKED){ showMsg('regErr','Registration is closed \u2014 the draw has taken place'); return; }
+  fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:name,number:num})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error){ showMsg('regErr',d.error); }
+    else {
+      showMsg('regOk','You are registered on number '+num+'! Please arrange payment of \u00a310 with the secretary. \u2713','ok');
+      document.getElementById('pn').value='';
+      loadData(false);
+    }
+  })
+  .catch(function(){ showMsg('regErr','Registration failed \u2014 please try again'); });
+}
+
+function delP(n){
+  if(!confirm('Remove '+PL[n]+' from number '+n+'?')) return;
+  fetch('/api/admin/delete',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:adminPwd,number:n})})
+  .then(function(){ loadData(false); });
+}
+
+// ── RENDER DRAW ───────────────────────────────────────────────────────────────
+function renderDraw(){
+  if(!DRAW) return;
+  var card=document.getElementById('drawResultCard');
+  card.style.display='block';
+
+  // Find who won 1st 2nd 3rd based on their team finishing position
+  // For the sweepstake prizes are just 1st/2nd/3rd number holders
+  // We'll show full table sorted by number, with podium for first 3 entries
+  var podium=document.getElementById('podium');
+  var body=document.getElementById('drawBody');
+  var prizeMap={1:{amt:'\u00a3150',cls:'p1',icon:'\ud83e\udd47'},2:{amt:'\u00a365',cls:'p2',icon:'\ud83e\udd48'},3:{amt:'\u00a325',cls:'p3',icon:'\ud83e\udd49'}};
+
+  // Podium: just show first 3 numbers as placeholder until tournament
+  var podHtml='';
+  for(var pos=1;pos<=3;pos++){
+    var pr=prizeMap[pos];
+    podHtml+='<div class="podium-card '+pr.cls+'">';
+    podHtml+='<span class="pod-pos">'+pr.icon+'</span>';
+    podHtml+='<span class="pod-prize '+pr.cls+'">'+pr.amt+'</span>';
+    podHtml+='<span class="pod-lbl" style="font-size:10px;color:#64748b;display:block;margin-top:4px">Prize for '+['1st','2nd','3rd'][pos-1]+' place team</span>';
+    podHtml+='</div>';
+  }
+  podium.innerHTML=podHtml;
+
+  // Full table
+  var rows='';
+  var nums=Object.keys(DRAW).map(Number).sort(function(a,b){return a-b;});
+  nums.forEach(function(n){
+    var team=DRAW[n];
+    var player=PL[n]||'—';
+    rows+='<tr><td><strong>'+n+'</strong></td><td>'+player+'</td><td>'+team+'</td></tr>';
+  });
+  body.innerHTML=rows;
+}
+
+// ── PLAYER LIST ───────────────────────────────────────────────────────────────
+function rPL(){
+  var el=document.getElementById('pl');
+  var ks=Object.keys(PL).map(Number).sort(function(a,b){return a-b;});
+  if(!ks.length){ el.innerHTML='<div class="em">No players registered yet</div>'; return; }
+  var h='';
+  ks.forEach(function(n){
+    var team=DRAW&&DRAW[n]?DRAW[n]:'Draw pending';
+    h+='<div class="pi"><div class="pn">'+n+'</div>';
+    h+='<div class="pm"><span>'+PL[n]+'</span><span class="pt">'+team+'</span></div>';
+    if(isAdmin) h+='<button class="db" onclick="delP('+n+')">&#215;</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+
+// ── MAIN DISPLAY ──────────────────────────────────────────────────────────────
+function go(){
+  var sc=Object.keys(PL).length;
+  document.getElementById('ss').textContent=sc+'/48';
+
+  var ds=document.getElementById('drawStatus');
+  if(DRAW_LOCKED){ ds.textContent='Complete'; ds.style.color='#4ade80'; }
+  else if(sc===48){ ds.textContent='Ready!'; ds.style.color='#fbbf24'; }
+  else{ ds.textContent=(48-sc)+' to go'; ds.style.color='#94a3b8'; }
+
+  document.getElementById('lockedBanner').style.display=DRAW_LOCKED?'block':'none';
+  document.getElementById('registerCard').style.display=DRAW_LOCKED?'none':'block';
+
+  if(DRAW_LOCKED) renderDraw();
+  else document.getElementById('drawResultCard').style.display='none';
+
+  // Grid
+  for(var i=1;i<=48;i++){
+    var b=document.getElementById('nb'+i);
+    if(!b) continue;
+    b.className='nb'+(PL[i]?' s':'');
+  }
+
+  rSel(); rPL();
+}
+
+// ── LOAD ──────────────────────────────────────────────────────────────────────
+function loadData(manual){
+  if(manual) setSyncMsg('Refreshing...');
+  fetch('/api/data')
+  .then(function(r){return r.json();})
+  .then(function(d){
+    PL=d.players||{}; DRAW=d.draw||null; DRAW_LOCKED=d.drawLocked||false; TEAMS=d.teams||[];
+    var t=new Date(), hm=t.getHours()+':'+(t.getMinutes()<10?'0':'')+t.getMinutes();
+    setSyncMsg('Synced '+hm+' \u2014 '+Object.keys(PL).length+'/48 registered');
+    go();
+  })
+  .catch(function(){
+    setSyncMsg('Ready');
+    go();
+  });
+  if(autoTimer) clearInterval(autoTimer);
+  autoTimer=setInterval(function(){loadData(false);},30000);
+}
+
+loadData(false);
+</script>
+</body>
+</html>
