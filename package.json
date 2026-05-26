@@ -1,0 +1,12 @@
+{
+  "name": "largs-colts-bonus-ball",
+  "version": "1.0.0",
+  "description": "Largs Colts 2017 Bonus Ball Lottery",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
