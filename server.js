@@ -1,12 +1,13 @@
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
+const { MongoClient } = require('mongodb');
 const app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'colts2026';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const TEAMS = [
   'Argentina','France','England','Brazil','Spain','Portugal','Germany','Netherlands',
@@ -17,25 +18,38 @@ const TEAMS = [
   'Peru','Algeria','Egypt','Nigeria','Ivory Coast','Mali','New Zealand','Albania'
 ];
 
-// Use /tmp for writable storage on Render
-const DB = '/tmp/worldcup-data.json';
+let db, collection;
 
-function readDB() {
+async function connectDB() {
   try {
-    if (!fs.existsSync(DB)) {
-      return { players: {}, draw: null, drawLocked: false };
-    }
-    const raw = fs.readFileSync(DB, 'utf8');
-    return JSON.parse(raw);
+    const client = new MongoClient(MONGODB_URI);
+    await client.connect();
+    db = client.db('largscolts');
+    collection = db.collection('worldcup');
+    console.log('MongoDB connected');
+  } catch(e) {
+    console.error('MongoDB connection error:', e.message);
+  }
+}
+
+async function readDB() {
+  try {
+    const doc = await collection.findOne({ _id: 'state' });
+    if (!doc) return { players: {}, draw: null, drawLocked: false };
+    return { players: doc.players || {}, draw: doc.draw || null, drawLocked: doc.drawLocked || false };
   } catch(e) {
     console.error('readDB error:', e.message);
     return { players: {}, draw: null, drawLocked: false };
   }
 }
 
-function writeDB(data) {
+async function writeDB(data) {
   try {
-    fs.writeFileSync(DB, JSON.stringify(data), 'utf8');
+    await collection.updateOne(
+      { _id: 'state' },
+      { $set: { players: data.players, draw: data.draw, drawLocked: data.drawLocked } },
+      { upsert: true }
+    );
     return true;
   } catch(e) {
     console.error('writeDB error:', e.message);
@@ -44,38 +58,29 @@ function writeDB(data) {
 }
 
 // Public: get data
-app.get('/api/data', (req, res) => {
-  const db = readDB();
-  res.json({ ...db, teams: TEAMS });
+app.get('/api/data', async (req, res) => {
+  const data = await readDB();
+  res.json({ ...data, teams: TEAMS });
 });
 
 // Public: register
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   try {
     const { name, number } = req.body;
     const num = parseInt(number, 10);
-
     if (!name || !num || num < 1 || num > 48) {
       return res.status(400).json({ error: 'Invalid name or number' });
     }
-
-    const db = readDB();
-
-    if (db.drawLocked) {
+    const data = await readDB();
+    if (data.drawLocked) {
       return res.status(400).json({ error: 'The draw has already taken place — registration is closed.' });
     }
-
-    if (db.players[num]) {
-      return res.status(400).json({ error: 'Number ' + num + ' is already taken by ' + db.players[num] });
+    if (data.players[num]) {
+      return res.status(400).json({ error: 'Number ' + num + ' is already taken by ' + data.players[num] });
     }
-
-    db.players[num] = name;
-    const saved = writeDB(db);
-
-    if (!saved) {
-      return res.status(500).json({ error: 'Could not save data — please try again' });
-    }
-
+    data.players[num] = name;
+    const saved = await writeDB(data);
+    if (!saved) return res.status(500).json({ error: 'Could not save — please try again' });
     res.json({ ok: true });
   } catch(e) {
     console.error('register error:', e.message);
@@ -84,92 +89,63 @@ app.post('/api/register', (req, res) => {
 });
 
 // Admin: save full state
-app.post('/api/admin', (req, res) => {
-  try {
-    const { password, data } = req.body;
-    if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
-    writeDB(data);
-    res.json({ ok: true });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
-  }
+app.post('/api/admin', async (req, res) => {
+  const { password, data } = req.body;
+  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
+  await writeDB(data);
+  res.json({ ok: true });
 });
 
 // Admin: run the draw
-app.post('/api/admin/draw', (req, res) => {
+app.post('/api/admin/draw', async (req, res) => {
   try {
     const { password } = req.body;
     if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
-
-    const db = readDB();
-    if (db.drawLocked) return res.status(400).json({ error: 'Draw already locked' });
-
-    const sold = Object.keys(db.players).length;
-    if (sold < 48) {
-      return res.status(400).json({ error: 'Not all 48 numbers sold yet (' + sold + '/48)' });
-    }
-
-    // Fisher-Yates shuffle
+    const data = await readDB();
+    if (data.drawLocked) return res.status(400).json({ error: 'Draw already locked' });
+    const sold = Object.keys(data.players).length;
+    if (sold < 48) return res.status(400).json({ error: 'Not all 48 numbers sold yet (' + sold + '/48)' });
     const shuffled = [...TEAMS];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-
     const draw = {};
-    for (let i = 1; i <= 48; i++) {
-      draw[i] = shuffled[i - 1];
-    }
-
-    db.draw = draw;
-    db.drawLocked = true;
-    writeDB(db);
+    for (let i = 1; i <= 48; i++) draw[i] = shuffled[i - 1];
+    data.draw = draw;
+    data.drawLocked = true;
+    await writeDB(data);
     res.json({ ok: true, draw });
   } catch(e) {
-    console.error('draw error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
 // Admin: delete player
-app.post('/api/admin/delete', (req, res) => {
-  try {
-    const { password, number } = req.body;
-    if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
-    const db = readDB();
-    delete db.players[number];
-    writeDB(db);
-    res.json({ ok: true });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
-  }
+app.post('/api/admin/delete', async (req, res) => {
+  const { password, number } = req.body;
+  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
+  const data = await readDB();
+  delete data.players[number];
+  await writeDB(data);
+  res.json({ ok: true });
 });
 
 // Admin: reset draw
-app.post('/api/admin/resetdraw', (req, res) => {
-  try {
-    const { password } = req.body;
-    if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
-    const db = readDB();
-    db.draw = null;
-    db.drawLocked = false;
-    writeDB(db);
-    res.json({ ok: true });
-  } catch(e) {
-    res.status(500).json({ error: e.message });
-  }
+app.post('/api/admin/resetdraw', async (req, res) => {
+  const { password } = req.body;
+  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
+  const data = await readDB();
+  data.draw = null;
+  data.drawLocked = false;
+  await writeDB(data);
+  res.json({ ok: true });
 });
 
 // Health check
-app.get('/api/health', (req, res) => {
-  const db = readDB();
-  res.json({ 
-    status: 'ok', 
-    players: Object.keys(db.players).length,
-    drawLocked: db.drawLocked,
-    dbPath: DB,
-    writable: (() => { try { fs.writeFileSync(DB + '.test', 'test'); fs.unlinkSync(DB + '.test'); return true; } catch(e) { return false; } })()
-  });
+app.get('/api/health', async (req, res) => {
+  const data = await readDB();
+  res.json({ status: 'ok', players: Object.keys(data.players).length, drawLocked: data.drawLocked });
 });
 
 app.get('*', (req, res) => {
@@ -177,4 +153,6 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('Running on port ' + PORT));
+connectDB().then(() => {
+  app.listen(PORT, () => console.log('Running on port ' + PORT));
+});
