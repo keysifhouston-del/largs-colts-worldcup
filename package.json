@@ -1,12 +1,11 @@
 {
-  "name": "largs-colts-bonus-ball",
+  "name": "largs-colts-worldcup",
   "version": "1.0.0",
-  "description": "Largs Colts 2017 Bonus Ball Lottery",
+  "description": "Largs Colts 2026 World Cup Sweepstake",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
+  "scripts": { "start": "node server.js" },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0"
   }
 }
