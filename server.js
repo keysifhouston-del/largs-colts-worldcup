@@ -9,14 +9,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'colts2026';
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// CORRECT confirmed 2026 FIFA World Cup teams
+// CORRECT confirmed 2026 FIFA World Cup teams (all 48)
 const TEAMS = [
-  'Argentina','France','England','Brazil','Spain','Portugal','Germany','Netherlands',
-  'Belgium','Croatia','Morocco','Senegal','USA','Mexico','Japan','South Korea',
-  'Switzerland','Denmark','Austria','Australia','Poland','Colombia','Uruguay','Ecuador',
-  'Canada','Scotland','Serbia','Cameroon','South Africa','Tunisia','Saudi Arabia','Iran',
-  'Qatar','Costa Rica','Panama','Honduras','Norway','Venezuela','Paraguay','Sweden',
-  'Peru','Algeria','Egypt','Nigeria','Bosnia and Herzegovina','Uzbekistan','New Zealand','Jordan'
+  'USA','Mexico','Canada','Japan','Iran','South Korea','Australia','Saudi Arabia',
+  'Qatar','Uzbekistan','Jordan','Iraq','Argentina','Brazil','Uruguay','Colombia',
+  'Ecuador','Paraguay','New Zealand','Morocco','Senegal','Egypt','Algeria','Tunisia',
+  'South Africa','Ivory Coast','Ghana','Cape Verde','DR Congo','England','France',
+  'Spain','Germany','Portugal','Netherlands','Belgium','Croatia','Switzerland',
+  'Austria','Scotland','Norway','Bosnia and Herzegovina','Sweden','Turkiye',
+  'Czechia','Panama','Curacao','Haiti'
 ];
 
 let db, collection;
