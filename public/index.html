@@ -164,6 +164,7 @@ footer{text-align:center;padding:14px;font-size:11px;color:#94a3b8;border-top:1p
   <button class="btn gold" id="runDrawBtn" onclick="confirmDraw()">&#127381; Run the draw — assign teams to numbers</button>
   <div class="msg err" id="drawErr"></div>
   <div id="resetDrawWrap" style="display:none">
+    <button class="btn green" onclick="fixDraw()" style="margin-bottom:8px">&#9989; Fix draw — replace with correct 2026 teams</button>
     <button class="btn gray" onclick="resetDraw()">Reset draw (use with caution)</button>
   </div>
   <div style="margin-top:10px;padding-top:10px;border-top:1px solid #86efac">
@@ -351,7 +352,28 @@ function runDraw(){
   },50);
 }
 
-function resetDraw(){
+function fixDraw(){
+  if(!confirm('This will reassign all 48 correct 2026 World Cup teams to the existing numbers. Player assignments stay the same — only the teams change. Continue?')) return;
+  hideMsg('drawErr');
+  setSyncMsg('Fixing draw...');
+  fetch('/api/admin/fixdraw',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:adminPwd})})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.error){
+      showMsg('drawErr',d.error);
+      setSyncMsg('Fix failed');
+    } else {
+      DRAW=d.draw; DRAW_LOCKED=true;
+      renderDraw(); go();
+      setSyncMsg('Draw fixed with correct 2026 teams \u2713');
+      alert('Done! All 48 correct World Cup teams have been assigned.');
+    }
+  })
+  .catch(function(){ showMsg('drawErr','Fix failed — please try again'); });
+}
+
+
   if(!confirm('Reset the draw? This removes all team assignments. Players keep their numbers.')) return;
   fetch('/api/admin/resetdraw',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({password:adminPwd})})
