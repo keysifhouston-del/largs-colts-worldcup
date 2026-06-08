@@ -9,13 +9,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'colts2026';
 const MONGODB_URI = process.env.MONGODB_URI;
 
+// CORRECT confirmed 2026 FIFA World Cup teams
 const TEAMS = [
   'Argentina','France','England','Brazil','Spain','Portugal','Germany','Netherlands',
   'Belgium','Croatia','Morocco','Senegal','USA','Mexico','Japan','South Korea',
   'Switzerland','Denmark','Austria','Australia','Poland','Colombia','Uruguay','Ecuador',
-  'Canada','Wales','Serbia','Cameroon','Ghana','Tunisia','Saudi Arabia','Iran',
-  'Qatar','Costa Rica','Panama','Honduras','Bolivia','Venezuela','Paraguay','Chile',
-  'Peru','Algeria','Egypt','Nigeria','Ivory Coast','Mali','New Zealand','Albania'
+  'Canada','Scotland','Serbia','Cameroon','South Africa','Tunisia','Saudi Arabia','Iran',
+  'Qatar','Costa Rica','Panama','Honduras','Norway','Venezuela','Paraguay','Sweden',
+  'Peru','Algeria','Egypt','Nigeria','Bosnia and Herzegovina','Uzbekistan','New Zealand','Jordan'
 ];
 
 let db, collection;
@@ -116,6 +117,31 @@ app.post('/api/admin/draw', async (req, res) => {
     data.drawLocked = true;
     await writeDB(data);
     res.json({ ok: true, draw });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Admin: fix draw with correct teams — keeps number assignments, re-shuffles team names
+app.post('/api/admin/fixdraw', async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Wrong password' });
+    const data = await readDB();
+    if (!data.draw) return res.status(400).json({ error: 'No draw to fix' });
+
+    // Shuffle correct teams and reassign to same numbers
+    const shuffled = [...TEAMS];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const newDraw = {};
+    for (let i = 1; i <= 48; i++) newDraw[i] = shuffled[i - 1];
+    data.draw = newDraw;
+    data.drawLocked = true;
+    await writeDB(data);
+    res.json({ ok: true, draw: newDraw });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
